@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{C3BEFDF6-32DB-4776-AC31-0BF414DD4475}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>dscapi</RootNamespace>
+    <AssemblyName>dscapi</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ExternalConsole>true</ExternalConsole>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ExternalConsole>true</ExternalConsole>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Web" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>bin\Debug\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="sdk\entity\AuthorizationToken.cs" />
+    <Compile Include="sdk\entity\ErrorExceptionDesc.cs" />
+    <Compile Include="sdk\entity\GetTokenRequest.cs" />
+    <Compile Include="sdk\entity\RefreshTokenRequest.cs" />
+    <Compile Include="sdk\entity\ResponseStatus.cs" />
+    <Compile Include="sdk\entity\ResponseWrapper.cs" />
+    <Compile Include="sdk\exception\OceanException.cs" />
+    <Compile Include="sdk\http\HttpClient.cs" />
+    <Compile Include="sdk\policy\ClientPolicy.cs" />
+    <Compile Include="sdk\policy\GrantType.cs" />
+    <Compile Include="sdk\policy\Protocol.cs" />
+    <Compile Include="sdk\policy\RequestPolicy.cs" />
+    <Compile Include="sdk\primitive\NullableBool.cs" />
+    <Compile Include="sdk\primitive\NullableByte.cs" />
+    <Compile Include="sdk\primitive\NullableChar.cs" />
+    <Compile Include="sdk\primitive\NullableDateTime.cs" />
+    <Compile Include="sdk\primitive\NullableDouble.cs" />
+    <Compile Include="sdk\primitive\NullableFloat.cs" />
+    <Compile Include="sdk\primitive\NullableInt.cs" />
+    <Compile Include="sdk\primitive\NullableLong.cs" />
+    <Compile Include="sdk\primitive\NullablePrimitiveObject.cs" />
+    <Compile Include="sdk\serialize\DeSerializer.cs" />
+    <Compile Include="sdk\serialize\Json2Deserializer.cs" />
+    <Compile Include="sdk\serialize\Param2RequestSerializer.cs" />
+    <Compile Include="sdk\serialize\Serializer.cs" />
+    <Compile Include="sdk\serialize\SerializerProvider.cs" />
+    <Compile Include="sdk\util\DateUtil.cs" />
+    <Compile Include="sdk\util\SignatureUtil.cs" />
+    <Compile Include="sdk\AbstractRequest.cs" />
+    <Compile Include="sdk\APIFacade.cs" />
+    <Compile Include="sdk\APIId.cs" />
+    <Compile Include="sdk\Request.cs" />
+    <Compile Include="sdk\Response.cs" />
+    <Compile Include="sdk\SyncAPIClient.cs" />
+    <Compile Include="dsc\goods\attr\list\gdwgoodsattrlit.cs" />
+    <Compile Include="dsc\goods\Goods.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
