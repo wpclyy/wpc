@@ -34,7 +34,7 @@ namespace com.alibaba.openapi.client.http
             if ("GET".Equals(requestPolicy.HttpMethod))
             {
 
-                String queryString = createParameterStr(parameters);
+                String queryString = createParameterStr_double(parameters);
                 String uriStr = buildRequestUri(requestPolicy, request);
                 uriStr = uriStr + "&" + queryString;
                 Uri uri = new Uri(uriStr);
@@ -293,19 +293,19 @@ namespace com.alibaba.openapi.client.http
             Serializer serializer = SerializerProvider.getInstance().getSerializer(requestPolicy.RequestProtocol);
 
             Dictionary<String, Object> parameters = serializer.serialize(request);
-            if (!requestPolicy.RequestProtocol.Equals(requestPolicy.ResponseProtocol))
-            {
-                parameters.Add("_aop_responseFormat", requestPolicy.ResponseProtocol);
-            }
-            if (requestPolicy.RequestSendTimestamp)
-            {
-                parameters.Add("_aop_timestamp", DateUtil.currentTimeMillis());
-            }
-            parameters.Add("_aop_datePattern", DateUtil.getDatePattern());
-            if (accessToken != null)
-            {
-                parameters.Add("access_token", accessToken);
-            }
+            //if (!requestPolicy.RequestProtocol.Equals(requestPolicy.ResponseProtocol))
+            //{
+            //    parameters.Add("_aop_responseFormat", requestPolicy.ResponseProtocol);
+            //}
+            //if (requestPolicy.RequestSendTimestamp)
+            //{
+            //    parameters.Add("_aop_timestamp", DateUtil.currentTimeMillis());
+            //}
+            //parameters.Add("_aop_datePattern", DateUtil.getDatePattern());
+            //if (accessToken != null)
+            //{
+            //    parameters.Add("access_token", accessToken);
+            //}
             return parameters;
         }
 
