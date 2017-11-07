@@ -32,6 +32,13 @@ namespace com.alibaba.openapi.client
             string result = httpClient.request<T>(request, request.RequestPolicyInstance, accessToken);
             return result;
         }
+
+        public string sendimg<T>(UploadParameterType uploadpara,Request request)
+        {
+            HttpClient httpClient = new HttpClient(clientPolicy);
+            string result = httpClient.Execute(uploadpara,request, request.RequestPolicyInstance);
+            return result;
+        }
     }
 }
 

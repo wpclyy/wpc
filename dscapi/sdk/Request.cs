@@ -27,6 +27,5 @@ namespace com.alibaba.openapi.client
             get { return requestPolicyInstance; }
             set { requestPolicyInstance = value; }
         }
-        
     }
 }

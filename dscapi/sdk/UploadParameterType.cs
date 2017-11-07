@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Goudiw
+namespace com.alibaba.openapi.client
 {
     /// <summary>
     /// 上传文件 - 请求参数类
@@ -11,14 +11,10 @@ namespace Goudiw
     {
         public UploadParameterType()
         {
-            FileNameKey = "upfile";
+            FileNameKey = "file";
             Encoding = Encoding.UTF8;
-            PostParameters = new List<string[]>();
         }
-        /// <summary>
-        /// 上传地址
-        /// </summary>
-        public string Url { get; set; }
+
         /// <summary>
         /// 文件名称key
         /// </summary>
@@ -35,9 +31,5 @@ namespace Goudiw
         /// 上传文件的流
         /// </summary>
         public Stream UploadStream { get; set; }
-        /// <summary>
-        /// 上传文件 携带的参数集合
-        /// </summary>
-        public List<string[]> PostParameters { get; set; } 
     }
 }
