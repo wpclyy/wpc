@@ -4,30 +4,21 @@ using goudiw.sdk.client.policy;
 
 namespace dscapi.dsc.goods
 {
-    public class Attribute: Request
+    public class Attributeupdate: Request
     {
-        public Attribute()
+        public Attributeupdate(string attr_id)
         {
             OceanApiId = new APIId();
             OceanApiId.NamespaceValue = "method";
-            OceanApiId.Name = "dsc.attribute.insert.post";
+            OceanApiId.Name = "dsc.attribute.update.post";
             OceanApiId.Strtypename = "format";
             OceanApiId.Strtypevalue = "json";
             OceanApiId.Version = 1;
+            OceanApiId.Filedname = "attr_id";
+            OceanApiId.Filedvalue = attr_id;
             RequestPolicyInstance = new RequestPolicy();
             RequestPolicyInstance.UseHttps = false;
             RequestPolicyInstance.HttpMethod = "POST";
-        }
-
-        int attr_id;//属性ID
-        public int getattr_id()
-        {
-            return attr_id;
-        }
-
-        public void setattr_id(int attr_id)
-        {
-            this.attr_id = attr_id;
         }
 
         int cat_id;//属性类型ID
@@ -60,7 +51,7 @@ namespace dscapi.dsc.goods
 
         public void setattr_cat_type(int attr_cat_type)
         {
-            this.attr_cat_type= attr_cat_type;
+            this.attr_cat_type = attr_cat_type;
         }
 
         int attr_input_type;//      该属性值的录入方式

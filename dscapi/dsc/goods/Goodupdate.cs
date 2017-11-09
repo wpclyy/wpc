@@ -1,12 +1,12 @@
 ﻿using System;
-using com.alibaba.openapi.client;
-using com.alibaba.openapi.client.policy;
+using com.goudiw;
+using goudiw.sdk.client.policy;
 
 namespace dscapi.dsc.goods
 {
     public class Goodupdate: Request
     {
-        public Goodupdate()
+        public Goodupdate(String goodid)
         {
             OceanApiId = new APIId();
             OceanApiId.NamespaceValue = "method";
@@ -14,24 +14,11 @@ namespace dscapi.dsc.goods
             OceanApiId.Strtypename = "format";
             OceanApiId.Strtypevalue = "json";
             OceanApiId.Version = 1;
+            OceanApiId.Filedname = "goods_id";
+            OceanApiId.Filedvalue = goodid;
             RequestPolicyInstance = new RequestPolicy();
             RequestPolicyInstance.UseHttps = false;
             RequestPolicyInstance.HttpMethod = "POST";
-        }
-
-        int Goods_id;//商品ID 
-        /// <summary>
-        /// 商品ID
-        /// </summary>
-        /// <value>The goods identifier.</value>
-        public int getgoods_id()
-        {
-            return Goods_id;
-        }
-
-        public void setgoods_id(int Goods_id)
-        {
-            this.Goods_id = Goods_id;
         }
 
 

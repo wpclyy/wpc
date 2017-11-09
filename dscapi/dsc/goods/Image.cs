@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using com.alibaba.openapi.client;
-using com.alibaba.openapi.client.policy;
+using com.goudiw;
+using goudiw.sdk.client.policy;
 
 namespace dscapi.dsc.goods
 {
