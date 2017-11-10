@@ -6,13 +6,18 @@ using dscapi.dsc.goods;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.IO;
 
 namespace com.goudiw
 {
     public class DeserialSpec
     {
-        public DeserialSpec()
+        SyncAPIClient instance = null;
+        string alistr = "";
+        public DeserialSpec(SyncAPIClient instance,string alistr)
         {
+            this.instance = instance;
+            this.alistr = alistr;
         }
 
         /// <summary>
@@ -164,6 +169,147 @@ namespace com.goudiw
                 }
             }
             return reloadspec;
+        }
+
+
+        public JToken QuChong(DataRow dr, Dictionary<string, gdsdk.Attribute> speclist, int goods_id, Dictionary<string, JObject> uploadimg)
+        {
+            Stream s = null;
+            string result = "";
+            Image img = new Image();
+            img.setid(goods_id);
+            List<string> goods_attr = new List<string>();
+
+            //规格匹配包括价格，第二次使用该字段数据
+            string skumodelstr = dr["skumodelstr"].ToString();
+            JObject obj = (JObject)JsonConvert.DeserializeObject(skumodelstr);
+            JToken jt = obj["skuList"];
+
+
+
+            //解析规格对应图片
+            string specinfo = dr["skuInfos"].ToString();
+            object oo = JsonConvert.DeserializeObject(specinfo);
+            JArray spinfosm = (JArray)oo;
+            //合并相同属性值
+            Dictionary<string, string> qucongspec = new Dictionary<string, string>();
+            foreach (JToken ssm in spinfosm)
+            {
+                foreach (JToken d in ssm["attributes"].Children())
+                {
+                    string attributeValue = d["attributeValue"].ToString();
+                    string skuImageUrl = d["skuImageUrl"].ToString();
+                    if (!qucongspec.ContainsKey(attributeValue))
+                    {
+                        qucongspec.Add(attributeValue, skuImageUrl);
+                    }
+                }
+
+            }
+            //获取属性值所属ID
+            Dictionary<string, string[]> newval = new Dictionary<string, string[]>();
+            foreach (KeyValuePair<string, string> jj in qucongspec)
+            {
+
+                foreach (KeyValuePair<string, gdsdk.Attribute> sl in speclist)
+                {
+                    gdsdk.Attribute attr = sl.Value;
+                    //和现有规格比较是否已存在
+                    List<string> speval = new List<string>(attr.attr_values.Split(new string[] { "\r\n" }, StringSplitOptions.None));
+                    //判断图片是否已在图片相册中，有则获取现有相册中图片地址，没有则上传图片获取返回图片地址
+                    if (speval.Contains(jj.Key) && jj.Value.Trim() != "")
+                    {
+
+                        GoodsAttr ga = new GoodsAttr();
+                        ga.setattr_id(attr.attr_id.ToString());
+                        ga.setgoods_id(goods_id);
+                        ga.setattr_value(jj.Key);
+
+                        string goods_thumb = "";
+                        string goods_img = "";
+                        if (uploadimg.ContainsKey(jj.Value))
+                        {
+                            JObject oop = uploadimg[jj.Value];
+                            goods_thumb = oop["data"]["goods_thumb"].ToString();
+                            goods_img = oop["data"]["goods_img"].ToString();
+                        }
+                        else
+                        {
+                            using (HttpClientClass hc = new HttpClientClass())
+                            {
+                                s = hc.htmlimg(alistr + jj.Value);
+                            }
+                            result = instance.sendimg<string>(new UploadParameterType { UploadStream = s, FileNameValue = "goudiw.jpg" }, img);
+                            JObject oop = (JObject)JsonConvert.DeserializeObject(result);
+                            goods_thumb = oop["data"]["goods_thumb"].ToString();
+                            goods_img = oop["data"]["goods_img"].ToString();
+                        }
+                        ga.setattr_img_flie(goods_thumb);
+                        ga.setattr_gallery_flie(goods_img);
+                        ga.setattr_checked("0");
+                        result = instance.send<string>(ga);
+                        JObject attrresult = (JObject)JsonConvert.DeserializeObject(result);
+                        if (attrresult["result"].ToString() == "success")
+                        {
+                            //goods_attr.Add(attrresult["id"].ToString());
+                            checkattr(ref jt, jj.Key, attrresult["id"].ToString());
+                        }
+                    }
+                    else if (speval.Contains(jj.Key))
+                    {
+                        GoodsAttr ga = new GoodsAttr();
+                        ga.setattr_id(attr.attr_id.ToString());
+                        ga.setgoods_id(goods_id);
+                        ga.setattr_value(jj.Key);
+                        ga.setattr_img_flie("");
+                        ga.setattr_gallery_flie("");
+                        ga.setattr_checked("0");
+                        result = instance.send<string>(ga);
+                        JObject attrresult = (JObject)JsonConvert.DeserializeObject(result);
+                        if (attrresult["result"].ToString() == "success")
+                        {
+                            //goods_attr.Add(attrresult["id"].ToString());
+                            checkattr(ref jt, jj.Key, attrresult["id"].ToString());
+                        }
+                    }
+                }
+            }
+
+
+
+           
+
+            return jt;
+        }
+
+
+
+        private void checkattr(ref JToken jt,string attrval ,string attr_id)
+        {
+            foreach (JToken j in jt.Children())
+            {
+                foreach (JToken t in j["attributeModelList"].Children())
+                {
+
+                    string key = "";
+                    string val = "";
+                    if (t["sourceAttributeValue"] != null && t["sourceAttributeName"].ToString() != "")
+                    {
+                        key = t["sourceAttributeName"].ToString();
+                        val = t["sourceAttributeValue"].ToString();
+                    }
+                    else if (t["targetAttributeValue"] != null && t["targetAttributeValue"].ToString() != "")
+                    {
+                        key = t["targetAttributeName"].ToString();
+                        val = t["targetAttributeValue"].ToString();
+                    }
+
+                    if (val.Trim() == attrval)
+                    {
+                        t["attr_id"] = attr_id;
+                    }
+                }
+            }
         }
     }
 }

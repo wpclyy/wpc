@@ -29,12 +29,13 @@ namespace dscapi
             string alistr = "https://cbu01.alicdn.com/";
 
             string str = "server=192.168.2.100;user id=Fany;password=wang198912;database=GCollection";
-            DataSet ds = MySqlHelper.GetDataSet(str, "SELECT * FROM `productinfo` where id=7", null);
+            DataSet ds = MySqlHelper.GetDataSet(str, "SELECT * FROM `productinfo` where id=29", null);
 
-            int cat_id = 20;
+            int cat_id = 21;
             for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
             {
                 DataRow dr = ds.Tables[0].Rows[i];
+
 
                 //商品相册
                 string[] imglist = dr["imagelist"].ToString().Split(',');
@@ -53,6 +54,7 @@ namespace dscapi
                 gd.setreview_status(3);
                 gd.setis_alone_sale(1);
                 gd.setis_on_sale(1);
+                gd.setgoods_type(cat_id);
 
                 //解析阿里巴巴商品详情信息，获取其中图片
                 DeHtml dh = new DeHtml();
@@ -78,6 +80,7 @@ namespace dscapi
                 string spec = dr["skumodelstr"].ToString();
                 if (sm["result"].ToString() == "success")
                 {
+                    Console.WriteLine("插入商品基本信息");
                     //插入图片
                     int goods_id = int.Parse(sm["id"].ToString());
                     Image img = new Image();
@@ -92,6 +95,7 @@ namespace dscapi
                     JObject im = (JObject)JsonConvert.DeserializeObject(result);
                     if (im["error"].ToString() == "0")
                     {
+                        Console.WriteLine("上传封面图片\r\n");
                         uploadimg.Add(imglist[0], im);
                     }
                     //更新产品封面图片
@@ -101,7 +105,8 @@ namespace dscapi
                     gu.setoriginal_img(im["data"]["original_img"].ToString());
                     string gdobj = instance.send<string>(gu);
                     JObject upgd = (JObject)JsonConvert.DeserializeObject(gdobj);
-                    string msg = dr["productTitle"].ToString() + "------" + upgd["msg"].ToString() + "\r\n";
+                    Console.WriteLine("更新封面图片\r\n");
+                    //string msg = dr["productTitle"].ToString() + "------" + upgd["msg"].ToString() + "\r\n";
                     for (int g = 1; g < imglist.Length;g++)
                     {
                         s = null;
@@ -116,83 +121,42 @@ namespace dscapi
                             uploadimg.Add(imglist[g], im);
                         }
                     }
-
+                    Console.WriteLine("上传相册图片\r\n");
                     //解析规格
-                    DeserialSpec dspec = new DeserialSpec();
+                    DeserialSpec dspec = new DeserialSpec(instance,alistr);
                     Dictionary<string, gdsdk.Attribute> speclist = dspec.Deserial(dr, instance, cat_id);
+                    Console.WriteLine("解析规格数据\r\n");
+                    JToken goods_attr = dspec.QuChong(dr,speclist,goods_id,uploadimg);
 
-                    //解析规格对应图片
-                    string specinfo = dr["skuInfos"].ToString();
-                    object oo = JsonConvert.DeserializeObject(specinfo);
-                    JArray spinfosm = (JArray)oo;
-                    foreach (JToken ssm in spinfosm)
+                    foreach(JToken j in goods_attr.Children())
                     {
-                        //合并相同属性值
-                        Dictionary<string, string> qucongspec = new Dictionary<string, string>();
-                        foreach (JToken d in ssm["attributes"].Children())
+                        string minRetailPrice = j["minRetailPrice"].ToString();
+                        string price = j["price"].ToString();
+                        string proxyPrice = j["proxyPrice"].ToString();
+                        string retailPrice = j["retailPrice"].ToString();
+                        List<string> attridlist = new List<string>();
+                        foreach(JToken t in j["attributeModelList"].Children())
                         {
-                            string attributeValue = d["attributeValue"].ToString();
-                            string skuImageUrl = d["skuImageUrl"].ToString();
-                            if (!qucongspec.ContainsKey(attributeValue))
-                            {
-                                qucongspec.Add(attributeValue, skuImageUrl);
-                            }
+                            attridlist.Add(t["attr_id"].ToString());
                         }
+                        string[] attids = attridlist.ToArray();
+                        string attridstr = string.Join("|", attids);
 
+                        Products pd = new Products();
+                        pd.setgoods_id(goods_id);
+                        pd.setgoods_attr(attridstr);
+                        pd.setproduct_price(price);
+                        pd.setproduct_market_price(retailPrice);
+                        pd.setproduct_number(1000);
+                        result = instance.send<string>(pd);
+                        im = (JObject)JsonConvert.DeserializeObject(result);
 
-                        //获取属性值所属ID
-                        Dictionary<string, string[]> newval = new Dictionary<string, string[]>();
-                        foreach (KeyValuePair<string, string> jj in qucongspec)
-                        {
-                            
-                            foreach (KeyValuePair<string, gdsdk.Attribute> sl in speclist)
-                            {
-                                gdsdk.Attribute attr = sl.Value;
-                                //和现有规格比较是否已存在
-                                List<string> speval = new List<string>(attr.attr_values.Split(new string[] { "\r\n" }, StringSplitOptions.None));
-                                //判断图片是否已在图片相册中，有则获取现有相册中图片地址，没有则上传图片获取返回图片地址
-                                if (speval.Contains(jj.Key) && jj.Value.Trim() != "")
-                                {
-                                    
-                                    GoodsAttr ga = new GoodsAttr();
-                                    ga.setattr_id(attr.attr_id.ToString());
-                                    ga.setgoods_id(goods_id);
-                                    ga.setattr_value(jj.Key);
-
-                                    string goods_thumb = "";
-                                    string goods_img = "";
-                                    if (uploadimg.ContainsKey(jj.Value))
-                                    {
-                                        JObject oop = uploadimg[jj.Value];
-                                        goods_thumb = oop["data"]["goods_thumb"].ToString();
-                                        goods_img = oop["data"]["goods_img"].ToString();
-                                    }
-                                    else
-                                    {
-                                        using (HttpClientClass hc = new HttpClientClass())
-                                        {
-                                            s = hc.htmlimg(alistr + jj.Value);
-                                        }
-                                        result = instance.sendimg<string>(new UploadParameterType { UploadStream = s, FileNameValue = "goudiw.jpg" }, img);
-                                        JObject oop = (JObject)JsonConvert.DeserializeObject(result);
-                                        goods_thumb = oop["data"]["goods_thumb"].ToString();
-                                        goods_img = oop["data"]["goods_img"].ToString();
-                                    }
-                                    ga.setattr_img_flie(goods_thumb);
-                                    ga.setattr_gallery_flie(goods_img);
-                                    ga.setattr_checked("0");
-                                    result = instance.send<string>(ga);
-                                }
-                            }
-                        }
                     }
 
 
+                    Console.WriteLine("规格值去重并提交\r\n");
 
-
-
-
-                    Console.WriteLine(msg);
+                    Console.WriteLine("----------------------" + dr["productTitle"].ToString() + "-----------------------");
                 }
 
             }
