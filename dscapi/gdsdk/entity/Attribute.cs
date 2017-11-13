@@ -1,5 +1,5 @@
 ﻿using System;
-namespace gdsdk
+namespace entity
 {
     public class Attribute
     {

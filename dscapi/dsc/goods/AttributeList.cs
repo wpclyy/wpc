@@ -51,5 +51,16 @@ namespace dscapi.dsc.goods
         {
             this.page_size = page_size;
         }
+
+        int attr_type;// 属性是否可选
+        public int getattr_type()
+        {
+            return attr_type;
+        }
+
+        public void setattr_type(int attr_type)
+        {
+            this.attr_type = attr_type;
+        }
     }
 }

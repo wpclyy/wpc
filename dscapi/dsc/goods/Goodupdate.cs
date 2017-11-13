@@ -64,5 +64,20 @@ namespace dscapi.dsc.goods
         {
             this.Original_img = Original_img;
         }
+
+        string Goods_desc;//商品详情描述
+        /// <summary>
+        /// 商品详情描述
+        /// </summary>
+        /// <value>The goods desc.</value>
+        public string getgoods_desc()
+        {
+            return Goods_desc;
+        }
+        public void setgoods_desc(string Goods_desc)
+        {
+            this.Goods_desc = Goods_desc;
+        }
+
     }
 }

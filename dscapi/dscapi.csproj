@@ -110,6 +110,8 @@
     <Compile Include="gdsdk\entity\Attribute.cs" />
     <Compile Include="dsc\goods\GoodsAttr.cs" />
     <Compile Include="dsc\goods\Products.cs" />
+    <Compile Include="gdsdk\GoodRequest.cs" />
+    <Compile Include="dsc\goods\GoodsType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
