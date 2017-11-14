@@ -81,63 +81,68 @@ namespace com.goudiw
             Dictionary<string,entity.Attribute> reloadspec = new Dictionary<string, entity.Attribute>();
             foreach(KeyValuePair<string,List<string>> att in specdic)
             {
-                bool flag = true;
-                foreach(JToken attr in list.Children())
-                {
-                    entity.Attribute ae = new entity.Attribute();
-                    List<string> att_val = att.Value;
-                    //属性存在
-                    if (att.Key == attr["attr_name"].ToString())
-                    {
-                        //现有规格值中是以字符串形式保存规格值，将其转换成数组
-                        List<string> attr_values = new List<string>(attr["attr_values"].ToString().Split(new string[] { "\r\n" }, StringSplitOptions.None));
+                //bool flag = true;
+                //foreach(JToken attr in list.Children())
+                //{
+                //    entity.Attribute ae = new entity.Attribute();
+                //    List<string> att_val = att.Value;
+                //    //属性存在
+                //    if (att.Key == attr["attr_name"].ToString())
+                //    {
+                //        //现有规格值中是以字符串形式保存规格值，将其转换成数组
+                //        List<string> attr_values = new List<string>(attr["attr_values"].ToString().Split(new string[] { "\r\n" }, StringSplitOptions.None));
 
-                        ae.attr_id = int.Parse(attr["attr_id"].ToString());
-                        ae.cat_id = int.Parse(attr["cat_id"].ToString());
-                        ae.attr_name = attr["attr_name"].ToString();
-                        ae.attr_cat_type = int.Parse(attr["attr_cat_type"].ToString());
-                        ae.attr_input_type = int.Parse(attr["attr_input_type"].ToString());
-                        ae.attr_type = int.Parse(attr["attr_type"].ToString());
-                        ae.attr_values = attr["attr_values"].ToString();
-                        ae.attr_index = int.Parse(attr["attr_index"].ToString());
-                        ae.sort_order = int.Parse(attr["sort_order"].ToString());
-                        ae.is_linked = int.Parse(attr["is_linked"].ToString());
-                        foreach (string v in att_val)
-                        {
-                            if (!attr_values.Contains(v))
-                            {
-                                if (ae.attr_values.Trim() == "")
-                                {
-                                    ae.attr_values = v;
-                                }
-                                else
-                                {
-                                    ae.attr_values += "\r\n" + v;
-                                }
-                            }
-                        }
+                //        ae.attr_id = int.Parse(attr["attr_id"].ToString());
+                //        ae.cat_id = int.Parse(attr["cat_id"].ToString());
+                //        ae.attr_name = attr["attr_name"].ToString();
+                //        ae.attr_cat_type = int.Parse(attr["attr_cat_type"].ToString());
+                //        ae.attr_input_type = int.Parse(attr["attr_input_type"].ToString());
+                //        ae.attr_type = int.Parse(attr["attr_type"].ToString());
+                //        ae.attr_values = attr["attr_values"].ToString();
+                //        ae.attr_index = int.Parse(attr["attr_index"].ToString());
+                //        ae.sort_order = int.Parse(attr["sort_order"].ToString());
+                //        ae.is_linked = int.Parse(attr["is_linked"].ToString());
+                //        foreach (string v in att_val)
+                //        {
+                //            if (!attr_values.Contains(v))
+                //            {
+                //                if (ae.attr_values.Trim() == "")
+                //                {
+                //                    ae.attr_values = v;
+                //                }
+                //                else
+                //                {
+                //                    ae.attr_values += "\r\n" + v;
+                //                }
+                //            }
+                //        }
 
-                        dscapi.dsc.goods.Attributeupdate attu = new Attributeupdate(ae.attr_id.ToString());
-                        attu.setcat_id(ae.cat_id);
-                        attu.setattr_name(ae.attr_name);
-                        attu.setattr_cat_type(ae.attr_cat_type);
-                        attu.setattr_input_type(ae.attr_input_type);
-                        attu.setattr_type(ae.attr_type);
-                        attu.setattr_values(ae.attr_values);
-                        string result = instance.send<string>(attu);
-                        JObject re = (JObject)JsonConvert.DeserializeObject(result);
-                        reloadspec.Add(att.Key, ae);
-                        flag = false;
-                    }
-                }
-                //属性不存在
+                //        dscapi.dsc.goods.Attributeupdate attu = new Attributeupdate(ae.attr_id.ToString());
+                //        attu.setcat_id(ae.cat_id);
+                //        attu.setattr_name(ae.attr_name);
+                //        attu.setattr_cat_type(ae.attr_cat_type);
+                //        attu.setattr_input_type(ae.attr_input_type);
+                //        attu.setattr_type(ae.attr_type);
+                //        attu.setattr_values(ae.attr_values);
+                //        string result = instance.send<string>(attu);
+                //        JObject re = (JObject)JsonConvert.DeserializeObject(result);
+                //        reloadspec.Add(att.Key, ae);
+                //        flag = false;
+                //    }
+                //}
+                ////属性不存在
 
-                if (flag)
-                {
+                //if (flag)
+                //{
                     dscapi.dsc.goods.Attribute at = new dscapi.dsc.goods.Attribute();
                     at.setcat_id(cat_id);
                     at.setattr_name(att.Key);
-                    at.setattr_cat_type(0);
+                    if(att.Key=="颜色")
+                    {
+                        at.setattr_cat_type(1);   
+                    }else{
+                        at.setattr_cat_type(0);   
+                    }
                     at.setattr_input_type(1);
                     at.setattr_type(1);
                     string sval = "";
@@ -167,7 +172,7 @@ namespace com.goudiw
                     ae.sort_order = 0;
                     ae.is_linked = 0;
                     reloadspec.Add(att.Key, ae);
-                }
+                //}
             }
             return reloadspec;
         }

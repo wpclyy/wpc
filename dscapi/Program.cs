@@ -16,7 +16,7 @@ namespace dscapi
             const string alistr = "https://cbu01.alicdn.com/";
 
             string str = "server=192.168.2.100;user id=Fany;password=wang198912;database=GCollection";
-            DataSet ds = MySqlHelper.GetDataSet(str, "SELECT * FROM `productinfo` where id>8026 and id<8050", null);
+            DataSet ds = MySqlHelper.GetDataSet(str, "SELECT * FROM `productinfo` where id>8045 and id<8050", null);
 
             int cat_id = 5;
             int category_id = 583;
