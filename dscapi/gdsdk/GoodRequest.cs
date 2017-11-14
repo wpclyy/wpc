@@ -48,9 +48,9 @@ namespace dscapi.gdsdk
             int goods_id = setgoods(category_id,saleinfo,goodsname,productID,cat_id,spec,1);
             Dictionary<string, JObject> uploadimg = updategoodsdesc(goods_id, imglt, desction);
 
-            setspec(spec,specinfo, goods_id, cat_id, uploadimg);
+            Dictionary<string, entity.Attribute> specattr = setspec(spec,specinfo, goods_id, cat_id, uploadimg);
 
-            dspec.GoodDetailPara(detailpara, goods_id, cat_id);
+            dspec.GoodDetailPara(detailpara, goods_id, cat_id,specattr);
             Console.WriteLine("规格值去重并提交\r\n");
 
             Console.WriteLine("---------" + dr["productTitle"].ToString() + "--------");
@@ -229,11 +229,11 @@ namespace dscapi.gdsdk
         /// 设置商品规格
         /// </summary>
         /// <returns>The setspec.</returns>
-        /// <param name="dr">Dr.</param>
+        /// <param name="skumodelstr">Dr.</param>
         /// <param name="goods_id">Goods identifier.</param>
         /// <param name="cat_id">Cat identifier.</param>
         /// <param name="uploadimg">Uploadimg.</param>
-        public void setspec(string skumodelstr, string specinfo,int goods_id,int cat_id,Dictionary<string, JObject> uploadimg)
+        public Dictionary<string, entity.Attribute> setspec(string skumodelstr, string specinfo,int goods_id,int cat_id,Dictionary<string, JObject> uploadimg)
         {
             Dictionary<string, entity.Attribute> speclist = dspec.Deserial(skumodelstr, instance, cat_id);
             Console.WriteLine("解析规格数据\r\n");
@@ -261,8 +261,8 @@ namespace dscapi.gdsdk
                     string result = instance.send<string>(pd);
                     JObject im = (JObject)JsonConvert.DeserializeObject(result);
                 }
-
             }
+            return speclist;
         }
 
 

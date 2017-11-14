@@ -137,12 +137,12 @@ namespace com.goudiw
                     dscapi.dsc.goods.Attribute at = new dscapi.dsc.goods.Attribute();
                     at.setcat_id(cat_id);
                     at.setattr_name(att.Key);
-                    if(att.Key=="颜色")
-                    {
-                        at.setattr_cat_type(1);   
-                    }else{
+                    //if(att.Key=="颜色")
+                    //{
+                    //    at.setattr_cat_type(1);   
+                    //}else{
                         at.setattr_cat_type(0);   
-                    }
+                    //}
                     at.setattr_input_type(1);
                     at.setattr_type(1);
                     string sval = "";
@@ -223,18 +223,18 @@ namespace com.goudiw
 
                     //获取属性值所属ID
                     Dictionary<string, string[]> newval = new Dictionary<string, string[]>();
+                    int setchecked = 0;
                     foreach (KeyValuePair<string, string> jj in qucongspec)
                     {
-
                         foreach (KeyValuePair<string, entity.Attribute> sl in speclist)
                         {
                             entity.Attribute attr = sl.Value;
                             //和现有规格比较是否已存在
                             List<string> speval = new List<string>(attr.attr_values.Split(new string[] { "\r\n" }, StringSplitOptions.None));
                             //判断图片是否已在图片相册中，有则获取现有相册中图片地址，没有则上传图片获取返回图片地址
+                           
                             if (speval.Contains(jj.Key) && jj.Value.Trim() != "")
                             {
-
                                 GoodsAttr ga = new GoodsAttr();
                                 ga.setattr_id(attr.attr_id.ToString());
                                 ga.setgoods_id(goods_id);
@@ -261,7 +261,16 @@ namespace com.goudiw
                                 }
                                 ga.setattr_img_flie(goods_thumb);
                                 ga.setattr_gallery_flie(goods_img);
-                                ga.setattr_checked("0");
+                                if (sl.Key=="颜色"&& setchecked == 0)
+                                {
+                                    ga.setattr_checked("1");
+                                    setchecked = 1;
+                                }
+                                else
+                                {
+                                    ga.setattr_checked("0");
+                                }
+
                                 result = instance.send<string>(ga);
                                 JObject attrresult = (JObject)JsonConvert.DeserializeObject(result);
                                 if (attrresult["result"].ToString() == "success")
@@ -277,7 +286,15 @@ namespace com.goudiw
                                 ga.setattr_value(jj.Key);
                                 ga.setattr_img_flie("");
                                 ga.setattr_gallery_flie("");
-                                ga.setattr_checked("0");
+                                if (sl.Key == "颜色" &&setchecked == 0)
+                                {
+                                    ga.setattr_checked("1");
+                                    setchecked = 1;
+                                }
+                                else
+                                {
+                                    ga.setattr_checked("0");
+                                }
                                 result = instance.send<string>(ga);
                                 JObject attrresult = (JObject)JsonConvert.DeserializeObject(result);
                                 if (attrresult["result"].ToString() == "success")
@@ -292,43 +309,45 @@ namespace com.goudiw
             }else{
                 return null;
             }
-
         }
 
         /// <summary>
         /// 商品詳情規格參數
         /// </summary>
-        /// <param name="dr">Dr.</param>
+        /// <param name="detailpara">Dr.</param>
         /// <param name="goods_id">Goods identifier.</param>
-        public void GoodDetailPara(string detailpara,int goods_id,int cat_id)
+        public void GoodDetailPara(string detailpara,int goods_id,int cat_id,Dictionary<string, entity.Attribute> specattr)
         {
             //商品詳情參數
             JArray obj = (JArray)JsonConvert.DeserializeObject(detailpara);
             foreach(JToken d in obj)
             {
                 string attributeName = d["attributeName"].ToString();
-                string val = d["value"].ToString();
-                dscapi.dsc.goods.Attribute at = new dscapi.dsc.goods.Attribute();
-                at.setcat_id(cat_id);
-                at.setattr_name(attributeName);
-                at.setattr_cat_type(0);
-                at.setattr_input_type(0);
-                at.setattr_type(0);
-                at.setattr_values("");
-                string result = instance.send<string>(at);
-                JObject attrobj = (JObject)JsonConvert.DeserializeObject(result);
-
-                if (attrobj["result"].ToString() == "success")
+                if (!specattr.ContainsKey(attributeName))
                 {
-                    GoodsAttr ga = new GoodsAttr();
-                    ga.setattr_id(attrobj["id"].ToString());
-                    ga.setgoods_id(goods_id);
-                    ga.setattr_value(val);
-                    ga.setattr_img_flie("");
-                    ga.setattr_gallery_flie("");
-                    ga.setattr_checked("0");
-                    result = instance.send<string>(ga);
-                    JObject attrresult = (JObject)JsonConvert.DeserializeObject(result);
+                    string val = d["value"].ToString();
+                    dscapi.dsc.goods.Attribute at = new dscapi.dsc.goods.Attribute();
+                    at.setcat_id(cat_id);
+                    at.setattr_name(attributeName);
+                    at.setattr_cat_type(0);
+                    at.setattr_input_type(0);
+                    at.setattr_type(0);
+                    at.setattr_values("");
+                    string result = instance.send<string>(at);
+                    JObject attrobj = (JObject)JsonConvert.DeserializeObject(result);
+
+                    if (attrobj["result"].ToString() == "success")
+                    {
+                        GoodsAttr ga = new GoodsAttr();
+                        ga.setattr_id(attrobj["id"].ToString());
+                        ga.setgoods_id(goods_id);
+                        ga.setattr_value(val);
+                        ga.setattr_img_flie("");
+                        ga.setattr_gallery_flie("");
+                        ga.setattr_checked("0");
+                        result = instance.send<string>(ga);
+                        JObject attrresult = (JObject)JsonConvert.DeserializeObject(result);
+                    }
                 }
             }
         }

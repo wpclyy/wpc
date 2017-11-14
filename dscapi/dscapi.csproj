@@ -56,6 +56,7 @@
     <Reference Include="HtmlAgilityPack">
       <HintPath>bin\Debug\HtmlAgilityPack.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="dsc\goods\Products.cs" />
     <Compile Include="gdsdk\GoodRequest.cs" />
     <Compile Include="dsc\goods\GoodsType.cs" />
+    <Compile Include="gdsdk\FilterHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
